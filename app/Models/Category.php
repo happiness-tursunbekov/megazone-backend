@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Traits\ModelCamelCase;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
 
 /**
  * @property Category[] $children
@@ -25,7 +26,8 @@ class Category extends Model
         'has_color',
         'size_field_id',
         'has_model',
-        'has_series'
+        'has_series',
+        'name_en'
     ];
 
     public function children()
@@ -36,5 +38,13 @@ class Category extends Model
     public function activeChildren()
     {
         return $this->children()->where('active', true);
+    }
+
+    public function getNameAttribute()
+    {
+        $lang = App::getLocale();
+        if ($lang && ($name = $this->getAttribute('name_' . $lang)))
+            return $name;
+        return $this->getRawOriginal('name');
     }
 }

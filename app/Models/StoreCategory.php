@@ -6,6 +6,7 @@ use App\Traits\ModelCamelCase;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 
 /**
  * @property StoreCategory[] $children
@@ -31,7 +32,8 @@ class StoreCategory extends Model
         'order',
         'has_color',
         'size_field_id',
-        'active'
+        'active',
+        'name_en'
     ];
 
     public static function boot() {
@@ -125,5 +127,13 @@ class StoreCategory extends Model
     public function matchCategory()
     {
         return $this->belongsTo(Category::class, 'match_category_id');
+    }
+
+    public function getNameAttribute()
+    {
+        $lang = App::getLocale();
+        if ($lang && ($name = $this->getAttribute('name_' . $lang)))
+            return $name;
+        return $this->getRawOriginal('name');
     }
 }
