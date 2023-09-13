@@ -15,4 +15,9 @@ class Address extends Model
         'lat',
         'lng'
     ];
+
+    protected $casts = [
+        'lng' => 'float',
+        'lat' => 'float'
+    ];
 }

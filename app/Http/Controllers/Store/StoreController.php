@@ -53,7 +53,9 @@ class StoreController extends Controller
             'address' => ['required', 'array'],
             'address.lat' => ['required', 'numeric'],
             'address.lng' => ['required', 'numeric'],
-            'address.fullPath' => ['required', 'string']
+            'address.fullPath' => ['required', 'string'],
+            'storeTypeIds' => ['required', 'array', 'min:1'],
+            'storeTypeIds.*' => ['required', 'integer', 'exists:store_types,id']
         ]);
 
         $data['active'] = true;
@@ -67,7 +69,10 @@ class StoreController extends Controller
         }
 
         $data['addressId'] = Address::create($data['address'])->id;
+        /** @var Store $store */
         $store = Store::create($data);
+
+        $store->types()->sync($data['storeTypeIds']);
 
         return $store->toJson();
     }
@@ -92,11 +97,14 @@ class StoreController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\Store  $store
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function edit(Store $store)
     {
-        //
+        return response()->json([
+            'item' => $store->toJson(),
+            'types' => StoreType::all()
+        ]);
     }
 
     /**
@@ -104,11 +112,46 @@ class StoreController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Store  $store
-     * @return \Illuminate\Http\Response
+     * @return StoreResource
      */
-    public function update(Request $request, Store $store)
+    public function update(Request $request, Store $store, FileService $fileService)
     {
-        //
+        $data = $request->validate([
+            'name' => ['required', 'string'],
+            'slug' => ['required', 'string', 'unique:stores,slug,' . $store->id],
+            'slogan' => ['nullable', 'string'],
+            'about' => ['nullable', 'string'],
+            'icon' => ['nullable', 'string'],
+            'cover' => ['nullable', 'string'],
+            'address' => ['required', 'array'],
+            'address.lat' => ['required', 'numeric'],
+            'address.lng' => ['required', 'numeric'],
+            'address.fullPath' => ['required', 'string'],
+            'storeTypeIds' => ['required', 'array', 'min:1'],
+            'storeTypeIds.*' => ['required', 'integer', 'exists:store_types,id']
+        ]);
+
+        if ($data['icon']) {
+            $data['iconId'] = $fileService->saveBase64File($data['icon'])->id;
+        }
+
+        if ($data['cover']) {
+            $data['coverId'] = $fileService->saveBase64File($data['cover'])->id;
+        }
+
+        if ($store->addressId) {
+            if (!$store->address->fill($data['address'])->save())
+                abort(500);
+            else
+                $data['addressId'] = Address::create($data['address'])->id;
+        }
+
+        if (!$store->fill($data)->save())
+            abort(500);
+
+        $store->types()->sync($data['storeTypeIds']);
+
+        return new StoreResource($store);
     }
 
     /**

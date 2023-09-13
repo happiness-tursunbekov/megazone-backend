@@ -36,6 +36,8 @@ Route::group(['prefix' => 'stores'], function () {
     Route::get('/', [StoreController::class, 'index'])->name('stores.index');
     Route::post('/', [StoreController::class, 'store'])->name('stores.store');
     Route::get('{store}', [StoreController::class, 'show'])->name('stores.show');
+    Route::get('{store}/edit', [StoreController::class, 'edit'])->name('stores.edit');
+    Route::put('{store}', [StoreController::class, 'update'])->name('stores.update');
     Route::group(['prefix' => '{store}/settings/categories'], function () {
         Route::get('/', [StoreCategoryController::class, 'index'])->name('stores.settings.categories.index');
         Route::post('/sort', [StoreCategoryController::class, 'sort'])->name('stores.categories.sort');

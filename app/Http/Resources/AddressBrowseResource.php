@@ -14,6 +14,11 @@ class AddressBrowseResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'fullPath' => $this->fullPath,
+            'lat' => $this->lat,
+            'lng' => $this->lng
+        ];
     }
 }

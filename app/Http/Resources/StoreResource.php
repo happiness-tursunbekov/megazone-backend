@@ -23,7 +23,8 @@ class StoreResource extends JsonResource
             'icon' => new FileBrowseResource($this->icon),
             'cover' => new FileBrowseResource($this->cover),
             'address' => new AddressBrowseResource($this->address),
-            'categories' => StoreCategoryBrowseResource::collection($this->activeParentCategories)
+            'categories' => StoreCategoryBrowseResource::collection($this->activeParentCategories),
+            'storeTypes' => $this->types
         ];
     }
 }
