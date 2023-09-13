@@ -39,7 +39,7 @@ class StoreController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return StoreResource
      */
     public function store(Request $request, FileService $fileService)
     {
@@ -74,7 +74,7 @@ class StoreController extends Controller
 
         $store->types()->sync($data['storeTypeIds']);
 
-        return $store->toJson();
+        return new StoreResource($store);
     }
 
     /**

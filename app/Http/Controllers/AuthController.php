@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AuthUserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,9 +23,10 @@ class AuthController extends Controller
             'username' => $attr['username']
         ]);
 
-        return response()->json(array_merge([
-            'token' => $user->createToken('API Token')->plainTextToken
-        ], $user->toArray()));
+        return response()->json([
+            'token' => $user->createToken('API Token')->plainTextToken,
+            'user' => new AuthUserResource($user)
+        ]);
     }
 
     public function login(Request $request)
@@ -38,9 +40,10 @@ class AuthController extends Controller
             return response()->json(['message' => 'Логин или пароль не верный'], 422);
         }
 
-        return response()->json(array_merge([
-            'token' => auth()->user()->createToken('API Token')->plainTextToken
-        ], auth()->user()->toArray()));
+        return response()->json([
+            'token' => auth()->user()->createToken('API Token')->plainTextToken,
+            'user' => new AuthUserResource(auth()->user())
+        ]);
     }
 
     public function logout()
@@ -54,6 +57,6 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        return response()->json($request->user()->toArray());
+        return new AuthUserResource($request->user());
     }
 }
