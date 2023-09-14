@@ -11,6 +11,7 @@ class Option extends Model
     use HasFactory, ModelCamelCase;
 
     protected $fillable = [
-        'title'
+        'title',
+        'title_en'
     ];
 }

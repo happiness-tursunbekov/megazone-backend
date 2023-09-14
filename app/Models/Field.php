@@ -20,7 +20,8 @@ class Field extends Model
         'description',
         'type',
         'code',
-        'addon'
+        'addon',
+        'name_en'
     ];
 
     public function options()
