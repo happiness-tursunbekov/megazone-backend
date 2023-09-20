@@ -46,6 +46,9 @@ Route::group(['prefix' => 'stores'], function () {
         Route::delete('{storeCategory}', [StoreCategoryController::class, 'destroy'])->name('stores.categories.destroy');
         Route::get('{storeCategory}/edit', [StoreCategoryController::class, 'edit'])->name('stores.categories.edit');
         Route::get('{storeCategory}/fields', [StoreCategoryController::class, 'fields'])->name('stores.categories.fields');
+        Route::post('{storeCategory}/fields', [StoreCategoryController::class, 'fieldStore'])->name('stores.categories.groups.store');
+        Route::get('{storeCategory}/groups', [StoreCategoryController::class, 'groups'])->name('stores.categories.groups');
+        Route::post('{storeCategory}/groups', [StoreCategoryController::class, 'groupStore'])->name('stores.categories.groups.store');
     });
     Route::group(['prefix' => '{store}/categories'], function () {
         Route::get('{storeCategory}', [StoreCategoryController::class, 'show'])->name('stores.categories.show');

@@ -6,14 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryBrowseResource;
 use App\Http\Resources\FieldResource;
 use App\Http\Resources\FileBrowseResource;
-use App\Http\Resources\StoreCategoryBrowseResource;
 use App\Http\Resources\StoreCategoryEditResource;
+use App\Http\Resources\StoreCategoryFieldGroupResource;
 use App\Http\Resources\StoreCategoryFieldResource;
 use App\Http\Resources\StoreCategoryResource;
 use App\Models\Field;
 use App\Models\Store;
 use App\Models\StoreCategory;
+use App\Models\StoreCategoryFieldGroup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -162,8 +164,63 @@ class CategoryController extends Controller
 
     public function fields($store, StoreCategory $storeCategory)
     {
-        return $storeCategory->fields->map(function (Field $field) {
-            return ['id' => $field->id, 'name' => $field->name];
-        });
+        return StoreCategoryFieldResource::collection($storeCategory->fields);
+    }
+
+    public function groups($store, StoreCategory $storeCategory)
+    {
+        return StoreCategoryFieldGroupResource::collection($storeCategory->groups);
+    }
+
+    public function groupStore($store, StoreCategory $storeCategory, Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string'],
+            'nameEn' => ['required', 'string'],
+        ]);
+
+        $data['storeCategoryId'] = $storeCategory->id;
+
+        $group = StoreCategoryFieldGroup::create($data);
+
+        return new StoreCategoryFieldGroupResource($group);
+    }
+
+    public function fieldStore($store, StoreCategory $storeCategory, Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string'],
+            'nameEn' => ['required', 'string'],
+            'type' => ['required', 'string'],
+            'filter' => ['required', 'boolean'],
+            'required' => ['required', 'boolean'],
+            'addon' => ['nullable', 'string'],
+            'storeCategoryFieldGroupId' => ['nullable', 'exists:store_category_field_groups,id'],
+            'fieldId' => ['nullable', 'exists:fields,id'],
+            'options' => ['nullable', 'array'],
+            'options.*.title' => ['required_if:options', 'string'],
+            'options.*.titleEn' => ['required_if:options', 'string'],
+        ]);
+
+        if (!$data['fieldId']) {
+            /** @var Field $field */
+            $field = Field::create([
+                'name' => $data['name'],
+                'nameEn' => $data['nameEn'],
+                'type' => $data['type'],
+                'code' => Str::slug($data['nameEn']),
+                'addon' => $data['addon']
+            ]);
+        } else {
+            $field = Field::find($data['fieldId']);
+        }
+
+        $storeCategory->fields()->attach($field->id, [
+            'store_category_field_group_id' => $data['storeCategoryFieldGroupId'],
+            'required' => $data['required'],
+            'filter' => $data['filter']
+        ]);
+
+        return new StoreCategoryFieldResource($field);
     }
 }

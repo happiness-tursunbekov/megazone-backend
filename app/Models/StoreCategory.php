@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\App;
  * @property Field[]|Collection $fields
  * @property File $icon
  * @property Category $matchCategory
+ * @property StoreCategoryFieldGroup[]|Collection $groups
 */
 class StoreCategory extends Model
 {
@@ -117,6 +118,11 @@ class StoreCategory extends Model
     public function fields()
     {
         return $this->belongsToMany(Field::class, 'store_category_field');
+    }
+
+    public function groups()
+    {
+        return $this->hasMany(StoreCategoryFieldGroup::class);
     }
 
     public function icon()
