@@ -11,6 +11,8 @@ use Illuminate\Support\Collection;
  * @property StoreCategory $storeCategory
  * @property StoreCategory[] $storeCategories
  * @property Review[]|Collection $reviews
+ * @property Field[]|Collection $fields
+ * @property CurrencyType $currencyType
 */
 class StoreProduct extends Model
 {
@@ -23,9 +25,8 @@ class StoreProduct extends Model
         'store_id',
         'brand_id',
         'model_id',
-        'series_id',
         'price',
-        'currency_id',
+        'currency_type_id',
         'country_id',
         'store_category_id',
         'sale',
@@ -89,5 +90,27 @@ class StoreProduct extends Model
     public function reviews()
     {
         return $this->morphMany(Review::class, 'model');
+    }
+
+    public function fields()
+    {
+        return $this->belongsToMany(Field::class, 'store_product_field');
+    }
+
+    public function saveField(Field $field, $value)
+    {
+        if ($field->type == Field::TYPE_SELECT)
+            $this->fields()->attach($field->id, [
+                'option_id' => $value
+            ]);
+        else
+            $this->fields()->attach($field->id, [
+                'value' => $value
+            ]);
+    }
+
+    public function currencyType()
+    {
+        return $this->belongsTo(CurrencyType::class);
     }
 }

@@ -3,17 +3,21 @@
 namespace App\Models;
 
 use App\Traits\ModelCamelCase;
+use App\Traits\NameTranslated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 
 /**
- * @property Category[] $children
- * @property Category[] $activeChildren
+ * @property Category[]|Collection $children
+ * @property Category[]|Collection $activeChildren
+ * @property Brand[]|Collection $brands
+ * @property BrandModel[]|Collection $brandModels
 */
 class Category extends Model
 {
-    use HasFactory, ModelCamelCase;
+    use HasFactory, ModelCamelCase, NameTranslated;
 
     protected $fillable = [
         'name',
@@ -40,11 +44,19 @@ class Category extends Model
         return $this->children()->where('active', true);
     }
 
-    public function getNameAttribute()
+    public function brands()
     {
-        $lang = App::getLocale();
-        if ($lang && ($name = $this->getAttribute('name_' . $lang)))
-            return $name;
-        return $this->getRawOriginal('name');
+        return $this->belongsToMany(Brand::class, 'category_brand');
+    }
+
+    public function brandModels()
+    {
+        return $this->belongsToMany(BrandModel::class, 'category_brand_model')
+            ->whereNull('parent_id');
+    }
+
+    public function brandModelsByBrandId(int $brandId)
+    {
+        return $this->brandModels()->where('brand_id', $brandId)->get();
     }
 }

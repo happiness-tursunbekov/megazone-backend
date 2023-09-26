@@ -16,6 +16,7 @@ use Illuminate\Support\Collection;
  * @property StoreCategory[]|Collection $activeParentCategories
  * @property StoreProduct[]|Collection $products
  * @property StoreType[]|Collection $types
+ * @property Currency $defaultCurrencyType
 */
 class Store extends Model
 {
@@ -29,7 +30,8 @@ class Store extends Model
         'active',
         'icon_id',
         'cover_id',
-        'address_id'
+        'address_id',
+        'default_currency_type_id'
     ];
 
     public static function findBySlug(string $slug) : self
@@ -80,5 +82,10 @@ class Store extends Model
     public static function active()
     {
         return self::where('active', true);
+    }
+
+    public function defaultCurrencyType()
+    {
+        return $this->belongsTo(CurrencyType::class, 'default_currency_type_id');
     }
 }

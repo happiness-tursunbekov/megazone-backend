@@ -52,9 +52,12 @@ Route::group(['prefix' => 'stores'], function () {
     });
     Route::group(['prefix' => '{store}/categories'], function () {
         Route::get('{storeCategory}', [StoreCategoryController::class, 'show'])->name('stores.categories.show');
+        Route::get('{storeCategory}/brand-models', [StoreCategoryController::class, 'brandModels'])->name('stores.categories.brand-models');
     });
     Route::group(['prefix' => '{store}/products'], function () {
         Route::get('/', [StoreProductController::class, 'index'])->name('stores.products.index');
+        Route::post('/', [StoreProductController::class, 'store'])->name('stores.products.store');
+        Route::get('/create', [StoreProductController::class, 'create'])->name('stores.products.create');
         Route::get('{storeProduct}', [StoreProductController::class, 'show'])->name('stores.products.show');
         Route::get('{storeProduct}/reviews', [StoreProductController::class, 'reviews'])->name('stores.products.show');
         Route::post('{storeProduct}/reviews', [StoreProductController::class, 'storeReview'])->name('stores.products.show')->middleware('auth:sanctum');

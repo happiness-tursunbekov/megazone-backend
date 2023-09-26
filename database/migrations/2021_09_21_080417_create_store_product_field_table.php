@@ -23,7 +23,7 @@ class CreateStoreProductFieldTable extends Migration
             $table->unsignedBigInteger('option_id')->nullable();
             $table->foreign('option_id')->on('options')
                 ->references('id')->onDelete('restrict');
-            $table->string('value');
+            $table->string('value')->nullable();
         });
     }
 

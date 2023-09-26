@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BrandModelBrowseResource;
 use App\Http\Resources\CategoryBrowseResource;
 use App\Http\Resources\FieldResource;
 use App\Http\Resources\FileBrowseResource;
 use App\Http\Resources\StoreCategoryEditResource;
-use App\Http\Resources\StoreCategoryFieldGroupResource;
-use App\Http\Resources\StoreCategoryFieldResource;
+use App\Http\Resources\StoreCategoryFieldEditResource;
+use App\Http\Resources\StoreCategoryFieldGroupEditResource;
 use App\Http\Resources\StoreCategoryResource;
 use App\Models\Field;
+use App\Models\Option;
 use App\Models\Store;
 use App\Models\StoreCategory;
 use App\Models\StoreCategoryFieldGroup;
@@ -164,12 +166,12 @@ class CategoryController extends Controller
 
     public function fields($store, StoreCategory $storeCategory)
     {
-        return StoreCategoryFieldResource::collection($storeCategory->fields);
+        return StoreCategoryFieldEditResource::collection($storeCategory->fields);
     }
 
     public function groups($store, StoreCategory $storeCategory)
     {
-        return StoreCategoryFieldGroupResource::collection($storeCategory->groups);
+        return StoreCategoryFieldGroupEditResource::collection($storeCategory->groups);
     }
 
     public function groupStore($store, StoreCategory $storeCategory, Request $request)
@@ -183,7 +185,7 @@ class CategoryController extends Controller
 
         $group = StoreCategoryFieldGroup::create($data);
 
-        return new StoreCategoryFieldGroupResource($group);
+        return new StoreCategoryFieldGroupEditResource($group);
     }
 
     public function fieldStore($store, StoreCategory $storeCategory, Request $request)
@@ -198,8 +200,8 @@ class CategoryController extends Controller
             'storeCategoryFieldGroupId' => ['nullable', 'exists:store_category_field_groups,id'],
             'fieldId' => ['nullable', 'exists:fields,id'],
             'options' => ['nullable', 'array'],
-            'options.*.title' => ['required_if:options', 'string'],
-            'options.*.titleEn' => ['required_if:options', 'string'],
+            'options.*.title' => ['required_with:options', 'string'],
+            'options.*.titleEn' => ['required_with:options', 'string'],
         ]);
 
         if (!$data['fieldId']) {
@@ -215,12 +217,32 @@ class CategoryController extends Controller
             $field = Field::find($data['fieldId']);
         }
 
+        if ($data['options'] && count($data['options']) > 0) {
+            foreach ($data['options'] as $optionData) {
+                $option = Option::create($optionData);
+                $field->options()->attach($option->id);
+            }
+        }
+
+        $field->options()->attach();
+
         $storeCategory->fields()->attach($field->id, [
             'store_category_field_group_id' => $data['storeCategoryFieldGroupId'],
             'required' => $data['required'],
             'filter' => $data['filter']
         ]);
 
-        return new StoreCategoryFieldResource($field);
+        return new StoreCategoryFieldEditResource($field);
+    }
+
+    public function brandModels($store, StoreCategory $storeCategory, Request $request)
+    {
+        $request->validate([
+            'brandId' => ['required', 'integer', 'exists:brands,id']
+        ]);
+
+        $models = $storeCategory->brandModelsByBrandId($request->get('brandId'));
+
+        return BrandModelBrowseResource::collection($models);
     }
 }

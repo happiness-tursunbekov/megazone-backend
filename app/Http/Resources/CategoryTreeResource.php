@@ -16,7 +16,7 @@ class CategoryTreeResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => $this->nameTranslated,
             'children' => self::collection($this->activeChildren),
             'icon' => $this->icon
         ];

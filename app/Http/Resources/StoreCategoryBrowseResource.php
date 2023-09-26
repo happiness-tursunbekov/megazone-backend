@@ -16,7 +16,7 @@ class StoreCategoryBrowseResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => $this->nameTranslated,
             'maxPrice' => $this->maxPrice,
             'children' => self::collection($this->children)
         ];

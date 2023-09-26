@@ -17,12 +17,21 @@ class Product extends Model
     protected $fillable = [
         'title',
         'brand_id',
-        'model_id',
-        'series_id'
+        'model_id'
     ];
 
     public function reviews()
     {
         return $this->morphMany(Review::class, 'model');
+    }
+
+    /**
+     * @param int $brandId
+     * @param int $modelId
+     * @return null|Product
+     */
+    public static function findByBrandModel(int $brandId, int $modelId)
+    {
+        return self::where(['brand_id' => $brandId, 'model_id' => $modelId])->first();
     }
 }

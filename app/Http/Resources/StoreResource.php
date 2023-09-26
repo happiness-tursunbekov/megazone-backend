@@ -24,7 +24,8 @@ class StoreResource extends JsonResource
             'cover' => new FileBrowseResource($this->cover),
             'address' => new AddressBrowseResource($this->address),
             'categories' => StoreCategoryBrowseResource::collection($this->activeParentCategories),
-            'storeTypes' => $this->types
+            'storeTypes' => $this->types,
+            'defaultCurrencyType' => new CurrencyTypeBrowseResource($this->defaultCurrencyType)
         ];
     }
 }

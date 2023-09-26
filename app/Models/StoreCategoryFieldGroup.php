@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\ModelCamelCase;
+use App\Traits\NameTranslated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -12,7 +13,7 @@ use Illuminate\Support\Collection;
 */
 class StoreCategoryFieldGroup extends Model
 {
-    use HasFactory, ModelCamelCase;
+    use HasFactory, ModelCamelCase, NameTranslated;
 
     protected $fillable = [
         'name',

@@ -17,7 +17,7 @@ class StoreCategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
+            'name' => $this->nameTranslated,
             'children' => StoreCategoryBrowseResource::collection($this->children),
             'colors' => OptionResource::collection($this->colors),
             'sizes' => OptionResource::collection($this->sizes),

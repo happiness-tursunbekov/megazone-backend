@@ -16,9 +16,8 @@ class StoreCategoryFieldGroupResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'nameEn' => $this->nameEn,
-            'fields' => $this->fields
+            'name' => $this->nameTranslated,
+            'fields' => StoreCategoryFieldResource::collection($this->fields)
         ];
     }
 }

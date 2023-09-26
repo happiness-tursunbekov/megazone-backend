@@ -3,15 +3,27 @@
 namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BrandBrowseResource;
+use App\Http\Resources\CurrencyBrowseResource;
+use App\Http\Resources\CurrencyTypeBrowseResource;
 use App\Http\Resources\ReviewBrowseResource;
+use App\Http\Resources\StoreCategoryFieldGroupResource;
+use App\Http\Resources\StoreCategoryFieldResource;
 use App\Http\Resources\StoreProductBrowseResource;
 use App\Http\Resources\StoreProductResource;
+use App\Models\Brand;
+use App\Models\BrandModel;
+use App\Models\Country;
+use App\Models\Currency;
+use App\Models\CurrencyType;
+use App\Models\Field;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\ReviewReaction;
 use App\Models\Store;
 use App\Models\StoreCategory;
 use App\Models\StoreProduct;
+use App\Services\FileService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -47,22 +59,103 @@ class ProductController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $request->validate([
+            'storeCategoryId' => ['required', 'integer', 'exists:store_categories,id']
+        ]);
+
+        /** @var StoreCategory $category */
+        $category = StoreCategory::find($request->get('storeCategoryId'));
+        return response()->json([
+            'fields' => StoreCategoryFieldResource::collection($category->fields),
+            'groups' => StoreCategoryFieldGroupResource::collection($category->groups),
+            'brands' => BrandBrowseResource::collection($category->brands),
+            'currencyTypes' => CurrencyTypeBrowseResource::collection(CurrencyType::all())
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return array
      */
-    public function store(Request $request)
+    public function store(Store $store, Request $request, FileService $fileService)
     {
-        //
+        $data = $request->validate([
+            'brandId' => ['required', 'integer', 'exists:brands,id'],
+            'modelId' => ['required', 'integer', 'exists:brand_models,id'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'currencyTypeId' => ['required', 'integer', 'exists:currency_types,id'],
+            'storeCategoryId' => ['required', 'integer', 'exists:store_categories,id'],
+            'title' => ['required', 'string'],
+            'description' => ['nullable', 'string'],
+            'fields' => ['nullable', 'array'],
+            'fields.*' => ['nullable'],
+            'groups' => ['nullable', 'array'],
+            'groups.*.fields' => ['nullable', 'array'],
+            'groups.*.fields.*' => ['nullable'],
+            'files' => ['required', 'array', 'min:1']
+        ]);
+
+        $product = Product::findByBrandModel($data['brandId'], $data['modelId']);
+
+        if (!$product) {
+            /** @var StoreCategory $storeCategory */
+            $storeCategory = StoreCategory::find($data['storeCategoryId']);
+
+            $brand = Brand::find($data['brandId']);
+            $model = BrandModel::find($data['modelId']);
+
+            /** @var Product $product */
+            $product = Product::create([
+                'title' => $brand->name . ' ' . $model->title,
+                'brandId' => $brand->id,
+                'modelId' => $model->id,
+                'categoryId' => $storeCategory->matchCategoryId
+            ]);
+        }
+
+        /** @var StoreProduct $storeProduct */
+        $storeProduct = StoreProduct::create([
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'productId' => $product->id,
+            'storeId' => $store->id,
+            'brandId' => $product->brandId,
+            'modelId' => $product->modelId,
+            'price' => $data['price'],
+            'currencyTypeId' => $data['currencyTypeId'],
+            'countryId' => 117,
+            'storeCategoryId' => $data['storeCategoryId']
+        ]);
+
+        foreach ($data['files'] as $fileBase64) {
+            $file = $fileService->saveBase64File($fileBase64);
+            $storeProduct->files()->attach($file->id);
+        }
+
+        if (is_array($data['fields'])) {
+            foreach ($data['fields'] as $fieldId => $value) {
+                /** @var Field $field */
+                $field = Field::find($fieldId);
+                $storeProduct->saveField($field, $value);
+            }
+        }
+
+        if (is_array($data['groups'])) {
+            foreach ($data['groups'] as $fields)
+                foreach ($fields as $fieldId => $value) {
+                    /** @var Field $field */
+                    $field = Field::find($fieldId);
+                    $storeProduct->saveField($field, $value);
+                }
+        }
+
+        return $storeProduct->toJson();
     }
 
     /**

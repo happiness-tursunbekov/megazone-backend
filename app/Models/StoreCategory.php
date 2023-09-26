@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\ModelCamelCase;
+use App\Traits\NameTranslated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -18,10 +19,12 @@ use Illuminate\Support\Facades\App;
  * @property File $icon
  * @property Category $matchCategory
  * @property StoreCategoryFieldGroup[]|Collection $groups
+ * @property BrandModel[]|Collection $brandModels
+ * @property Brand[]|Collection $brands
 */
 class StoreCategory extends Model
 {
-    use HasFactory, ModelCamelCase;
+    use HasFactory, ModelCamelCase, NameTranslated;
 
     protected $fillable = [
         'name',
@@ -102,18 +105,18 @@ class StoreCategory extends Model
         );
     }
 
-    public function getBrandsAttribute()
-    {
-        return Brand::hydrate(
-            self::join('store_category_store_product as scsp', 'scsp.store_category_id', '=', 'store_categories.id')
-                ->join('store_products as sp', 'sp.id', '=', 'scsp.store_product_id')
-                ->join('brands as b', 'b.id', '=', 'sp.brand_id')
-                ->select('b.*')
-                ->distinct('b.id')
-                ->get()
-                ->toArray()
-        );
-    }
+//    public function getBrandsAttribute()
+//    {
+//        return Brand::hydrate(
+//            self::join('store_category_store_product as scsp', 'scsp.store_category_id', '=', 'store_categories.id')
+//                ->join('store_products as sp', 'sp.id', '=', 'scsp.store_product_id')
+//                ->join('brands as b', 'b.id', '=', 'sp.brand_id')
+//                ->select('b.*')
+//                ->distinct('b.id')
+//                ->get()
+//                ->toArray()
+//        );
+//    }
 
     public function fields()
     {
@@ -135,11 +138,19 @@ class StoreCategory extends Model
         return $this->belongsTo(Category::class, 'match_category_id');
     }
 
-    public function getNameAttribute()
+    public function brands()
     {
-        $lang = App::getLocale();
-        if ($lang && ($name = $this->getAttribute('name_' . $lang)))
-            return $name;
-        return $this->getRawOriginal('name');
+        return $this->belongsToMany(Brand::class, 'store_category_brand');
+    }
+
+    public function brandModels()
+    {
+        return $this->belongsToMany(BrandModel::class, 'store_category_brand_model')
+            ->whereNull('parent_id');
+    }
+
+    public function brandModelsByBrandId(int $brandId)
+    {
+        return $this->brandModels()->where('brand_id', $brandId)->get();
     }
 }

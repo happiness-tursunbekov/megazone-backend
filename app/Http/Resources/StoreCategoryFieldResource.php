@@ -16,13 +16,13 @@ class StoreCategoryFieldResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'nameEn' => $this->nameEn,
+            'name' => $this->nameTranslated,
             'type' => $this->type,
             'code' => $this->code,
             'addon' => $this->addon,
             'pivot' => $this->pivot,
-            'options' => $this->options
+            'options' => OptionResource::collection($this->options),
+            'required' => $this->required
         ];
     }
 }

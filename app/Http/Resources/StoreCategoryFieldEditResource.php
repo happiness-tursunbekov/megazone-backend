@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryBrowseResource extends JsonResource
+class StoreCategoryFieldEditResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,7 +16,13 @@ class CategoryBrowseResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->nameTranslated
+            'name' => $this->name,
+            'nameEn' => $this->nameEn,
+            'type' => $this->type,
+            'code' => $this->code,
+            'addon' => $this->addon,
+            'pivot' => $this->pivot,
+            'options' => $this->options
         ];
     }
 }
