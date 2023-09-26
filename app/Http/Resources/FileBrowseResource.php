@@ -17,7 +17,7 @@ class FileBrowseResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'path' => asset($this->path)
+            'path' => asset('storage/' . $this->path)
         ];
     }
 }

@@ -16,7 +16,7 @@ class ProductFileResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'path' => asset($this->path),
+            'path' => asset('storage/' . $this->path),
             'colorId' => $this->pivot->color_id,
             'inStock' => $this->pivot->in_stock
         ];

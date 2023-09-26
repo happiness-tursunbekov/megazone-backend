@@ -19,7 +19,7 @@ class FileService
         preg_match('/:(.*?);/', $fileData[0], $fileType);
         $file = base64_decode($fileData[1]);
         $fileExt = explode('/', $fileType[1])[1];
-        $fileName = 'storage/' . date('Y/m/') . $fileType[1] . '/' . Str::uuid() . '.' . $fileExt;
+        $fileName = date('Y/m/') . $fileType[1] . '/' . Str::uuid() . '.' . $fileExt;
         Storage::disk('public')->put($fileName, $file);
         return File::create([
             'path' => $fileName,
