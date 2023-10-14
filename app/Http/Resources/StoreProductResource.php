@@ -30,7 +30,8 @@ class StoreProductResource extends JsonResource
             'new' => $this->new,
             'rating' => $this->reviews->count() > 0 ? round(array_sum($this->reviews->pluck('rating')->toArray()) / $this->reviews->count(), 1) : 0,
             'numberOfReviews' => $this->reviews->count(),
-            'description' => $this->description
+            'description' => $this->description,
+            'fields' => StoreProductFieldResource::collection($this->fields)
         ];
     }
 }

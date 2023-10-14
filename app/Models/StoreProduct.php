@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 
 /**
  * @property StoreCategory $storeCategory
- * @property StoreCategory[] $storeCategories
+ * @property StoreCategory[]|Collection $storeCategories
  * @property Review[]|Collection $reviews
  * @property Field[]|Collection $fields
  * @property CurrencyType $currencyType
@@ -58,15 +58,9 @@ class StoreProduct extends Model
         return $this->belongsTo(StoreCategory::class);
     }
 
-    public function getStoreCategoriesAttribute()
+    public function storeCategories()
     {
-        $categories = [];
-
-        if ($this->storeCategory->parent)
-            array_push($categories, ...$this->storeCategory->parents);
-        array_push($categories, $this->storeCategory);
-
-        return $categories;
+        return $this->belongsToMany(StoreCategory::class, 'store_category_store_product');
     }
 
     public function colors()
@@ -94,23 +88,54 @@ class StoreProduct extends Model
 
     public function fields()
     {
-        return $this->belongsToMany(Field::class, 'store_product_field');
+        return $this->hasMany(StoreProductField::class, 'store_product_id');
     }
 
     public function saveField(Field $field, $value)
     {
-        if ($field->type == Field::TYPE_SELECT)
-            $this->fields()->attach($field->id, [
-                'option_id' => $value
+        /** @var StoreProductField $productField */
+        if (!($productField = $this->fields()->where('field_id', $field->id)->first()))
+            $productField = $this->fields()->create([
+                'fieldId' => $field->id,
             ]);
-        else
-            $this->fields()->attach($field->id, [
-                'value' => $value
-            ]);
+
+        if ($field->type == Field::TYPE_SELECT) {
+            if ($productField->value)
+                return $productField->value->fill(['optionId' => $value])->save();
+            return $productField->values()->create(['optionId' => $value]);
+
+        }
+
+        if ($field->type == Field::TYPE_SELECT_MULTIPLE) {
+            $productField->values()->delete();
+            if (is_array($value)) {
+                foreach ($value as $val) {
+                    $productField->values()->create(['optionId' => $val]);
+                }
+                return true;
+            }
+            return $productField->values()->create(['optionId' => $value]);
+        }
+
+        if ($productField->value)
+            return $productField->value->fill(['value' => $value])->save();
+        return $productField->values()->create(['value' => $value]);
     }
 
     public function currencyType()
     {
         return $this->belongsTo(CurrencyType::class);
+    }
+
+    public function handleCategoryRelations()
+    {
+        $categoryIds = [$this->storeCategory->id];
+
+        if ($this->storeCategory->parent)
+            $this->storeCategory->parents->map(function (StoreCategory $storeCategory) use (&$categoryIds) {
+                $categoryIds[] = $storeCategory->id;
+            });
+
+        return $this->storeCategories()->sync($categoryIds);
     }
 }

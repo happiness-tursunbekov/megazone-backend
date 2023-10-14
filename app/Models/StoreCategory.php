@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\App;
 /**
  * @property StoreCategory[] $children
  * @property StoreCategory $parent
- * @property StoreCategory[] $parents
+ * @property StoreCategory[]|Collection $parents
  * @property Option[] $colors
  * @property Option[] $sizes
  * @property Field[]|Collection $fields
@@ -61,9 +61,9 @@ class StoreCategory extends Model
 
     public function getParentsAttribute()
     {
-        $categories = [];
-        function getParent(StoreCategory $storeCategory, &$categories) {
-            $categories[] = $storeCategory;
+        $categories = new Collection();
+        function getParent(StoreCategory $storeCategory, Collection &$categories) {
+            $categories->push($storeCategory);
             if ($storeCategory->parent)
                 getParent($storeCategory->parent, $categories);
         }
@@ -71,7 +71,7 @@ class StoreCategory extends Model
         if ($this->parent)
             getParent($this->parent, $categories);
 
-        return array_reverse($categories);
+        return $categories->reverse();
     }
 
     public function products()

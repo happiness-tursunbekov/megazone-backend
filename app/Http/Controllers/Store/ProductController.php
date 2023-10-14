@@ -133,6 +133,8 @@ class ProductController extends Controller
             'storeCategoryId' => $data['storeCategoryId']
         ]);
 
+        $storeProduct->handleCategoryRelations();
+
         foreach ($data['files'] as $fileBase64) {
             $file = $fileService->saveBase64File($fileBase64);
             $storeProduct->files()->attach($file->id);

@@ -17,6 +17,7 @@ class Field extends Model
     use HasFactory, ModelCamelCase, NameTranslated;
 
     const TYPE_SELECT = 'select';
+    const TYPE_SELECT_MULTIPLE = 'select_multiple';
     const TYPE_NUMBER = 'number';
     const TYPE_FLOAT = 'float';
     const TYPE_TEXT = 'text';

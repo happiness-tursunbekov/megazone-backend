@@ -66,8 +66,11 @@ Route::group(['prefix' => 'stores'], function () {
 });
 
 Route::get('test', function (Request $request) {
+    $products = \App\Models\StoreProduct::all()->map(function (\App\Models\StoreProduct $storeProduct) {
+        return $storeProduct->handleCategoryRelations();
+    });
     return response()->json([
-        'id' => $request->get('id'),
+        'id' => $products,
         'title' => 'test'
     ]);
 });
