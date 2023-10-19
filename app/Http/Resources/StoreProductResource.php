@@ -20,7 +20,7 @@ class StoreProductResource extends JsonResource
             'brand' => new BrandBrowseResource($this->brand),
             'model' => new ModelBrowseResource($this->brandModel),
             'price' => $this->sale ? $this->price - ($this->price * ($this->sale / 100)) : $this->price,
-            'currency' => new CurrencyBrowseResource($this->currency),
+            'currencyType' => new CurrencyTypeBrowseResource($this->currencyType),
             'files' => ProductFileResource::collection($this->files),
             'categories' => StoreProductCategoryResource::collection($this->storeCategories),
             'colors' => OptionResource::collection($this->colors),
