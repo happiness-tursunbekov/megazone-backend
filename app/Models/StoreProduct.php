@@ -33,6 +33,10 @@ class StoreProduct extends Model
         'new'
     ];
 
+    protected $casts = [
+        'price' => 'float'
+    ];
+
     public function brand()
     {
         return $this->belongsTo(Brand::class);
