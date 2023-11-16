@@ -25,7 +25,11 @@ class StoreResource extends JsonResource
             'address' => new AddressBrowseResource($this->address),
             'categories' => StoreCategoryBrowseResource::collection($this->activeParentCategories),
             'storeTypes' => $this->types,
-            'defaultCurrencyType' => new CurrencyTypeBrowseResource($this->defaultCurrencyType)
+            'defaultCurrencyType' => new CurrencyTypeBrowseResource($this->defaultCurrencyType),
+            'instagram' => $this->instagram,
+            'facebook' => $this->facebook,
+            'twitter' => $this->twitter,
+            'website' => $this->website,
         ];
     }
 }

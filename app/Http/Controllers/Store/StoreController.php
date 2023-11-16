@@ -164,4 +164,16 @@ class StoreController extends Controller
     {
         //
     }
+
+    public function storeSocialMedia(Store $store, Request $request)
+    {
+        $data = $request->validate([
+            'website' => ['nullable', 'string'],
+            'instagram' => ['nullable', 'string'],
+            'facebook' => ['nullable', 'string'],
+            'twitter' => ['nullable', 'string'],
+        ]);
+
+        return $store->fill($data)->save();
+    }
 }

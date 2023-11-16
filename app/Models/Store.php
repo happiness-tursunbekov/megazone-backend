@@ -31,7 +31,11 @@ class Store extends Model
         'icon_id',
         'cover_id',
         'address_id',
-        'default_currency_type_id'
+        'default_currency_type_id',
+        'instagram',
+        'facebook',
+        'twitter',
+        'website'
     ];
 
     public static function findBySlug(string $slug) : self
