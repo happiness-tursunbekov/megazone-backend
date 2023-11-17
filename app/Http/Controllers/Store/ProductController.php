@@ -38,12 +38,24 @@ class ProductController extends Controller
     {
         $request->validate([
             'categoryId' => ['nullable', 'integer', 'exists:store_categories,id'],
-            'perPage' => ['nullable', 'integer', 'max:100']
+            'perPage' => ['nullable', 'integer', 'max:100'],
+            'brandIds' => ['nullable', 'array'],
+            'brandIds.*' => ['nullable', 'integer', 'exists:brands,id'],
+            'sizeIds' => ['nullable', 'array'],
+            'colorId' => ['nullable', 'integer'],
+            'priceFrom' => ['nullable', 'numeric'],
+            'priceTo' => ['nullable', 'numeric'],
         ]);
 
         $perPage = $request->get('perPage', 25);
 
         $categoryId = $request->get('categoryId');
+
+        $brandIds = $request->get('brandIds');
+        $sizeIds = $request->get('sizeIds');
+        $colorId = $request->get('colorId');
+        $priceFrom = $request->get('priceFrom');
+        $priceTo = $request->get('priceTo');
 
         if ($categoryId) {
             /** @var StoreCategory $category */
@@ -52,6 +64,22 @@ class ProductController extends Controller
         } else {
             $products = $store->products();
         }
+
+        if ($brandIds && count($brandIds) > 0)
+            $products->whereIn('brand_id', $brandIds);
+
+        if ($priceFrom)
+            $products->where('price', '>=', $priceFrom);
+
+        if ($priceTo)
+            $products->where('price', '<=', $priceTo);
+
+        if ($colorId)
+            $products->where('color_id', $colorId);
+
+        if ($sizeIds && count($sizeIds) > 0)
+            $products->join('store_product_size', 'store_products.id', '=', 'store_product_size.store_product_id')
+            ->whereIn('store_product_size.size_id', $sizeIds);
 
         return StoreProductBrowseResource::collection($products->paginate($perPage));
     }
