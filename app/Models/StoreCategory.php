@@ -105,19 +105,6 @@ class StoreCategory extends Model
         );
     }
 
-//    public function getBrandsAttribute()
-//    {
-//        return Brand::hydrate(
-//            self::join('store_category_store_product as scsp', 'scsp.store_category_id', '=', 'store_categories.id')
-//                ->join('store_products as sp', 'sp.id', '=', 'scsp.store_product_id')
-//                ->join('brands as b', 'b.id', '=', 'sp.brand_id')
-//                ->select('b.*')
-//                ->distinct('b.id')
-//                ->get()
-//                ->toArray()
-//        );
-//    }
-
     public function fields()
     {
         return $this->belongsToMany(Field::class, 'store_category_field');

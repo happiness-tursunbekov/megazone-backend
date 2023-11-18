@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\App;
  * @property Category[]|Collection $activeChildren
  * @property Brand[]|Collection $brands
  * @property BrandModel[]|Collection $brandModels
+ * @property Category $parent
+ * @property Category[]|Collection $parents
 */
 class Category extends Model
 {
@@ -58,5 +60,36 @@ class Category extends Model
     public function brandModelsByBrandId(int $brandId)
     {
         return $this->brandModels()->where('brand_id', $brandId)->get();
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(StoreProduct::class,
+            'category_product',
+            'category_id',
+            'product_id',
+            'id',
+            'product_id'
+        );
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function getParentsAttribute()
+    {
+        $categories = new Collection();
+        function getParent(Category $storeCategory, Collection &$categories) {
+            $categories->push($storeCategory);
+            if ($storeCategory->parent)
+                getParent($storeCategory->parent, $categories);
+        }
+
+        if ($this->parent)
+            getParent($this->parent, $categories);
+
+        return $categories->reverse();
     }
 }

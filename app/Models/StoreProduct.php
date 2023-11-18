@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
  * @property Review[]|Collection $reviews
  * @property Field[]|Collection $fields
  * @property CurrencyType $currencyType
+ * @property Store $store
 */
 class StoreProduct extends Model
 {
@@ -141,5 +142,10 @@ class StoreProduct extends Model
             });
 
         return $this->storeCategories()->sync($categoryIds);
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
     }
 }

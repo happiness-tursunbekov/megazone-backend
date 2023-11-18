@@ -145,6 +145,8 @@ class ProductController extends Controller
                 'modelId' => $model->id,
                 'categoryId' => $storeCategory->matchCategoryId
             ]);
+
+            $product->handleCategoryRelations();
         }
 
         /** @var StoreProduct $storeProduct */

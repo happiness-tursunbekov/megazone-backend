@@ -25,6 +25,11 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::group(['prefix' => 'categories'], function () {
     Route::get('tree', [\App\Http\Controllers\CategoryController::class, 'tree'])->name('categories.tree');
+    Route::get('{category}', [\App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
+});
+
+Route::group(['prefix' => 'products'], function () {
+    Route::get('/', [\App\Http\Controllers\ProductController::class, 'index'])->name('products.index');
 });
 
 Route::group(['prefix' => 'fields'], function () {
