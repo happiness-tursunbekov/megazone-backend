@@ -198,6 +198,11 @@ class ProductController extends Controller
      */
     public function show($store, StoreProduct $storeProduct)
     {
+        $storeProduct->views++;
+        $storeProduct->save();
+
+        $storeProduct->product->views++;
+        $storeProduct->product->save();
         return new StoreProductResource($storeProduct);
     }
 

@@ -14,6 +14,7 @@ use Illuminate\Support\Collection;
  * @property Field[]|Collection $fields
  * @property CurrencyType $currencyType
  * @property Store $store
+ * @property Product $product
 */
 class StoreProduct extends Model
 {
@@ -31,7 +32,8 @@ class StoreProduct extends Model
         'country_id',
         'store_category_id',
         'sale',
-        'new'
+        'new',
+        'views'
     ];
 
     protected $casts = [
@@ -147,5 +149,10 @@ class StoreProduct extends Model
     public function store()
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 }

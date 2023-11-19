@@ -48,6 +48,9 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
+        $category->views++;
+        $category->save();
+
         return new CategoryResource($category);
     }
 

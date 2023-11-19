@@ -19,7 +19,8 @@ class Product extends Model
         'title',
         'brand_id',
         'model_id',
-        'category_id'
+        'category_id',
+        'views'
     ];
 
     public function reviews()

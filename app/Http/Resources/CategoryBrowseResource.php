@@ -16,7 +16,8 @@ class CategoryBrowseResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->nameTranslated
+            'name' => $this->nameTranslated,
+            'icon' => new FileBrowseResource($this->icon)
         ];
     }
 }

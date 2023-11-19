@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\App;
  * @property BrandModel[]|Collection $brandModels
  * @property Category $parent
  * @property Category[]|Collection $parents
+ * @property File $icon
+ * @property StoreProduct[]|Collection $products
 */
 class Category extends Model
 {
@@ -33,7 +35,8 @@ class Category extends Model
         'size_field_id',
         'has_model',
         'has_series',
-        'name_en'
+        'name_en',
+        'views'
     ];
 
     public function children()
@@ -91,5 +94,10 @@ class Category extends Model
             getParent($this->parent, $categories);
 
         return $categories->reverse();
+    }
+
+    public function icon()
+    {
+        return $this->belongsTo(File::class, 'icon_id');
     }
 }
