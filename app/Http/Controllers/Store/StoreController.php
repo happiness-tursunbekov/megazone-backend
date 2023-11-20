@@ -10,6 +10,7 @@ use App\Models\Store;
 use App\Models\StoreType;
 use App\Services\FileService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class StoreController extends Controller
 {
@@ -18,9 +19,20 @@ class StoreController extends Controller
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index()
+    public function index(Request $request)
     {
-        return StoreBrowseResource::collection(Store::active()->paginate(20));
+        $request->validate([
+            'query' => ['nullable', 'string']
+        ]);
+
+        $query = Str::lower($request->get('query'));
+
+        $stores = Store::active();
+
+        if ($query)
+            $stores->whereRaw("lower(name) like '%{$query}%'");
+
+        return StoreBrowseResource::collection($stores->paginate(20));
     }
 
     /**

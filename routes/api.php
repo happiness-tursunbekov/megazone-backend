@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('home', [\App\Http\Controllers\HomeController::class, 'index'])->name('home.index');
+Route::get('search', [\App\Http\Controllers\HomeController::class, 'search'])->name('search.index');
 
 Route::group(['prefix' => 'auth'], function () {
     Route::get('user', [\App\Http\Controllers\AuthController::class, 'user'])->middleware('auth:sanctum');
