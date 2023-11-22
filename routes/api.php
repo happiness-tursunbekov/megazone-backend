@@ -23,7 +23,8 @@ Route::get('search', [\App\Http\Controllers\HomeController::class, 'search'])->n
 Route::group(['prefix' => 'auth'], function () {
     Route::get('user', [\App\Http\Controllers\AuthController::class, 'user'])->middleware('auth:sanctum');
     Route::get('logout', [\App\Http\Controllers\AuthController::class, 'logout'])->middleware('auth:sanctum');
-    Route::post('login', [\App\Http\Controllers\AuthController::class, 'login']);
+    Route::post('login', [\App\Http\Controllers\AuthController::class, 'login'])->name('auth.login');
+    Route::post('google', [\App\Http\Controllers\AuthController::class, 'google'])->name('auth.google');
 });
 
 Route::group(['prefix' => 'categories'], function () {

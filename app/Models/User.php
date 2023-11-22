@@ -25,6 +25,9 @@ class User extends Authenticatable
         'name',
         'username',
         'password',
+        'last_name',
+        'gender',
+        'date_of_birth'
     ];
 
     /**
@@ -44,10 +47,20 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'date_of_birth' => 'date'
     ];
 
     public function stores()
     {
         return $this->belongsToMany(Store::class);
+    }
+
+    /**
+     * @param string $email
+     * @return User|null
+     */
+    public static function getByUsername(string $email)
+    {
+        return self::where('username', $email)->first();
     }
 }

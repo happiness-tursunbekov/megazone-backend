@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\AuthUserResource;
 use App\Models\User;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -58,5 +60,43 @@ class AuthController extends Controller
     public function user(Request $request)
     {
         return new AuthUserResource($request->user());
+    }
+
+    public function google(Request $request)
+    {
+        $request->validate([
+            'token' => ['required', 'string'],
+            'action' => ['nullable', 'register']
+        ]);
+
+        $client = new Client(['base_uri' => 'https://www.googleapis.com']);
+
+        try {
+            $res = $client->request('GET', '/oauth2/v3/userinfo', [
+                'headers' => ['Authorization' => 'Bearer ' . $request->get('token')]
+            ]);
+        } catch (GuzzleException $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+
+        $userData = json_decode($res->getBody()->getContents());
+
+        $user = User::getByUsername($userData['email']);
+
+        if (!$user)
+            return response()->json([
+                'success' => false,
+                'code' => 'user_not_found'
+            ]);
+        else {
+            Auth::login($user);
+
+            return response()->json([
+                'success' => true,
+                'code' => 'success',
+                'token' => auth()->user()->createToken('API Token')->plainTextToken,
+                'user' => new AuthUserResource($user)
+            ]);
+        }
     }
 }
