@@ -62,6 +62,11 @@ class AuthController extends Controller
         return new AuthUserResource($request->user());
     }
 
+    public function googleUrl()
+    {
+        return "https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&include_granted_scopes=true&response_type=token&state=megazone&redirect_uri=http://localhost:3000/!auth/google&client_id=398378570637-lh7e6hep1ld04ac86f6vder9mgvfqdb4.apps.googleusercontent.com";
+    }
+
     public function google(Request $request)
     {
         $request->validate([
