@@ -66,7 +66,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'token' => ['required', 'string'],
-            'action' => ['nullable', 'register']
+            'action' => ['nullable', 'string']
         ]);
 
         $client = new Client(['base_uri' => 'https://www.googleapis.com']);
@@ -81,12 +81,21 @@ class AuthController extends Controller
 
         $userData = json_decode($res->getBody()->getContents());
 
-        $user = User::getByUsername($userData['email']);
+        $user = User::getByUsername($userData->email);
+
+        if ($request->get('action') == 'signup' && !$user) {
+            $user = User::create([
+                'name' => $userData->given_name,
+                'lastName' => $userData->family_name,
+                'username' => $userData->email
+            ]);
+        }
 
         if (!$user)
             return response()->json([
                 'success' => false,
-                'code' => 'user_not_found'
+                'code' => 'user_not_found',
+                'email' => $userData->email
             ]);
         else {
             Auth::login($user);
