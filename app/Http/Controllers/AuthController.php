@@ -15,15 +15,12 @@ class AuthController extends Controller
     {
         $attr = $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|unique:users,phone',
+            'lastName' => 'required|string|max:255',
+            'username' => 'required|email|unique:users,username',
             'password' => 'required|string|min:8|confirmed'
         ]);
 
-        $user = User::create([
-            'name' => $attr['name'],
-            'password' => bcrypt($attr['password']),
-            'username' => $attr['username']
-        ]);
+        $user = User::create($attr);
 
         return response()->json([
             'token' => $user->createToken('API Token')->plainTextToken,
@@ -64,7 +61,7 @@ class AuthController extends Controller
 
     public function googleUrl()
     {
-        return "https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&include_granted_scopes=true&response_type=token&state=megazone&redirect_uri=http://localhost:3000/!auth/google&client_id=398378570637-lh7e6hep1ld04ac86f6vder9mgvfqdb4.apps.googleusercontent.com";
+        return "https://accounts.google.com/o/oauth2/v2/auth?scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&include_granted_scopes=true&response_type=token&redirect_uri=http://localhost:3000/!auth/google&client_id=398378570637-lh7e6hep1ld04ac86f6vder9mgvfqdb4.apps.googleusercontent.com";
     }
 
     public function google(Request $request)
