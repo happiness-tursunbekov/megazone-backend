@@ -71,6 +71,7 @@ Route::group(['prefix' => 'stores'], function () {
         Route::post('/', [StoreProductController::class, 'store'])->name('stores.products.store');
         Route::get('/create', [StoreProductController::class, 'create'])->name('stores.products.create');
         Route::get('{storeProduct}', [StoreProductController::class, 'show'])->name('stores.products.show');
+        Route::get('{storeProduct}/related', [StoreProductController::class, 'related'])->name('stores.products.related');
         Route::get('{storeProduct}/reviews', [StoreProductController::class, 'reviews'])->name('stores.products.show');
         Route::post('{storeProduct}/reviews', [StoreProductController::class, 'storeReview'])->name('stores.products.show')->middleware('auth:sanctum');
         Route::post('{storeProduct}/reviews/{review}/reaction', [StoreProductController::class, 'reviewReaction'])->name('stores.products.show');

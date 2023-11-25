@@ -295,4 +295,16 @@ class ProductController extends Controller
             'unhelpful' => $review->unhelpful
         ]);
     }
+
+    public function related($store, StoreProduct $storeProduct)
+    {
+        return StoreProductBrowseResource::collection(
+            $storeProduct->storeCategory
+                ->products()
+                ->where('id', '<>', $storeProduct->id)
+                ->orderBy('created_at')
+                ->limit(4)
+                ->get()
+        );
+    }
 }

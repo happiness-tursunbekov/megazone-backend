@@ -23,6 +23,7 @@ class StoreProductResource extends JsonResource
             'currencyType' => new CurrencyTypeBrowseResource($this->currencyType),
             'files' => ProductFileResource::collection($this->files),
             'categories' => StoreProductCategoryResource::collection($this->storeCategories),
+            'category' => new StoreProductCategoryResource($this->storeCategory),
             'colors' => OptionResource::collection($this->colors),
             'sizes' => OptionResource::collection($this->sizes),
             'sale' => $this->sale,
