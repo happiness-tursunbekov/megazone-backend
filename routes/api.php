@@ -45,11 +45,11 @@ Route::group(['prefix' => 'fields'], function () {
 Route::group(['prefix' => 'stores'], function () {
     Route::get('create', [StoreController::class, 'create'])->name('stores.create');
     Route::get('/', [StoreController::class, 'index'])->name('stores.index');
-    Route::post('/', [StoreController::class, 'store'])->name('stores.store');
+    Route::post('/', [StoreController::class, 'store'])->name('stores.store')->middleware('auth:sanctum');
     Route::get('{store}', [StoreController::class, 'show'])->name('stores.show');
     Route::get('{store}/edit', [StoreController::class, 'edit'])->name('stores.edit');
-    Route::put('{store}', [StoreController::class, 'update'])->name('stores.update');
-    Route::post('{store}/social-media', [StoreController::class, 'storeSocialMedia'])->name('stores.update');
+    Route::put('{store}', [StoreController::class, 'update'])->name('stores.update')->middleware('auth:sanctum');
+    Route::post('{store}/social-media', [StoreController::class, 'storeSocialMedia'])->name('stores.update')->middleware('auth:sanctum');
     Route::group(['prefix' => '{store}/settings/categories'], function () {
         Route::get('/', [StoreCategoryController::class, 'index'])->name('stores.settings.categories.index');
         Route::post('/sort', [StoreCategoryController::class, 'sort'])->name('stores.categories.sort');
@@ -61,14 +61,14 @@ Route::group(['prefix' => 'stores'], function () {
         Route::post('{storeCategory}/fields', [StoreCategoryController::class, 'fieldStore'])->name('stores.categories.groups.store');
         Route::get('{storeCategory}/groups', [StoreCategoryController::class, 'groups'])->name('stores.categories.groups');
         Route::post('{storeCategory}/groups', [StoreCategoryController::class, 'groupStore'])->name('stores.categories.groups.store');
-    });
+    })->middleware('auth:sanctum');
     Route::group(['prefix' => '{store}/categories'], function () {
         Route::get('{storeCategory}', [StoreCategoryController::class, 'show'])->name('stores.categories.show');
         Route::get('{storeCategory}/brand-models', [StoreCategoryController::class, 'brandModels'])->name('stores.categories.brand-models');
     });
     Route::group(['prefix' => '{store}/products'], function () {
         Route::get('/', [StoreProductController::class, 'index'])->name('stores.products.index');
-        Route::post('/', [StoreProductController::class, 'store'])->name('stores.products.store');
+        Route::post('/', [StoreProductController::class, 'store'])->name('stores.products.store')->middleware('auth:sanctum');
         Route::get('/create', [StoreProductController::class, 'create'])->name('stores.products.create');
         Route::get('{storeProduct}', [StoreProductController::class, 'show'])->name('stores.products.show');
         Route::get('{storeProduct}/related', [StoreProductController::class, 'related'])->name('stores.products.related');
@@ -76,14 +76,4 @@ Route::group(['prefix' => 'stores'], function () {
         Route::post('{storeProduct}/reviews', [StoreProductController::class, 'storeReview'])->name('stores.products.show')->middleware('auth:sanctum');
         Route::post('{storeProduct}/reviews/{review}/reaction', [StoreProductController::class, 'reviewReaction'])->name('stores.products.show');
     });
-});
-
-Route::get('test', function (Request $request) {
-    $products = \App\Models\StoreProduct::all()->map(function (\App\Models\StoreProduct $storeProduct) {
-        return $storeProduct->handleCategoryRelations();
-    });
-    return response()->json([
-        'id' => $products,
-        'title' => 'test'
-    ]);
 });

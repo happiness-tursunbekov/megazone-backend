@@ -86,6 +86,8 @@ class StoreController extends Controller
 
         $store->types()->sync($data['storeTypeIds']);
 
+        $store->users()->attach($request->user()->id);
+
         return new StoreResource($store);
     }
 

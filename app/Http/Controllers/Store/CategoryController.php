@@ -195,7 +195,7 @@ class CategoryController extends Controller
             'nameEn' => ['required', 'string'],
             'type' => ['required', 'string'],
             'filter' => ['required', 'boolean'],
-            'required' => ['required', 'boolean'],
+            'required' => ['nullable', 'boolean'],
             'addon' => ['nullable', 'string'],
             'storeCategoryFieldGroupId' => ['nullable', 'exists:store_category_field_groups,id'],
             'fieldId' => ['nullable', 'exists:fields,id'],
@@ -224,11 +224,9 @@ class CategoryController extends Controller
             }
         }
 
-        $field->options()->attach();
-
         $storeCategory->fields()->attach($field->id, [
             'store_category_field_group_id' => $data['storeCategoryFieldGroupId'],
-            'required' => $data['required'],
+            'required' => $data['required'] ?? false,
             'filter' => $data['filter']
         ]);
 

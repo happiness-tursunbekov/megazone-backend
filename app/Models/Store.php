@@ -17,6 +17,7 @@ use Illuminate\Support\Collection;
  * @property StoreProduct[]|Collection $products
  * @property StoreType[]|Collection $types
  * @property Currency $defaultCurrencyType
+ * @property User[]|Collection $users
 */
 class Store extends Model
 {
@@ -91,5 +92,10 @@ class Store extends Model
     public function defaultCurrencyType()
     {
         return $this->belongsTo(CurrencyType::class, 'default_currency_type_id');
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'store_user');
     }
 }
